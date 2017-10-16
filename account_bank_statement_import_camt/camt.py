@@ -106,6 +106,14 @@ class CamtParser(object):
         self.add_value_from_node(
             ns, node, './ns:BookgDt/ns:Dt', transaction, 'date')
 
+        # Some banks uses DtTM instead
+        if not transaction.get('date'):
+            self.add_value_from_node(
+                ns, node, './ns:BookgDt/ns:DtTm', transaction, 'date')
+            transaction['date'] = dateutil.parser.parse(
+                transaction['date']).date().strftime(
+                DEFAULT_SERVER_DATE_FORMAT)
+
         transaction['amount'] = self.parse_amount(ns, node)
 
         details_node = node.xpath(
