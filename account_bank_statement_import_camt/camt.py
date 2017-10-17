@@ -66,13 +66,14 @@ class CamtParser(object):
             ],
             transaction, 'ref'
         )
-        # unique_import_id
-        self.add_value_from_node(
-            ns, node, [
-                './ns:Refs/ns:AcctSvcrRef',
-            ],
-            transaction, 'unique_import_id'
-        )
+        # if unique_import_id is not within transaction element look up Refs
+        if not transaction.get('unique_import_id'):
+            self.add_value_from_node(
+                ns, node, [
+                    './ns:Refs/ns:AcctSvcrRef',
+                ],
+                transaction, 'unique_import_id'
+            )
         # remote party values
         party_type = 'Dbtr'
         party_type_node = node.xpath(
@@ -105,6 +106,11 @@ class CamtParser(object):
         transaction = {}
         self.add_value_from_node(
             ns, node, './ns:BookgDt/ns:Dt', transaction, 'date')
+
+        # AcctSvcrRef might be within transaction element
+
+        self.add_value_from_node(
+            ns, node, './ns:AcctSvcrRef', transaction, 'unique_import_id')
 
         # Some banks uses DtTM instead
         if not transaction.get('date'):
